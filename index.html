@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Valentine?</title>
+  <style>
+    body {
+      background: linear-gradient(135deg,#ff758c,#ff7eb3);
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 2;
+      min-width: 280px;
+    }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .yes { background: #ff4d6d; color: white; }
+
+    .no {
+      background: white;
+      color: #ff4d6d;
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti"></canvas>
+
+  <!-- Link to external song instead of bundling the audio file -->
+  <p style="position: absolute; left: 20px; bottom: 20px; z-index: 3;">
+    <a id="songLink" href="https://youtu.be/byxFUKxhT3s?si=zRQbgeukIHO-S9wH" target="_blank" rel="noopener" style="color: white; text-decoration: underline;">Listen: Alex Warren — Ordinary (YouTube)</a>
+  </p>
+
+  <div class="card">
+    <h1>💖 Nadia, will you be my Valentine? 💖</h1>
+    <button class="yes" onclick="yes()">Yes 💘</button>
+    <button class="no" id="noBtn">No 🙃</button>
+    <p id="reply"></p>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    const songLink = 'https://youtu.be/byxFUKxhT3s?si=zRQbgeukIHO-S9wH';
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Make NO button dodge
+    noBtn.addEventListener('mouseover', moveButton);
+    noBtn.addEventListener('touchstart', moveButton);
+
+    function moveButton() {
+      const card = document.querySelector('.card');
+      const maxX = card.offsetWidth - noBtn.offsetWidth;
+      const maxY = card.offsetHeight - noBtn.offsetHeight;
+      noBtn.style.left = Math.random() * Math.max(0, maxX) + 'px';
+      noBtn.style.top = Math.random() * Math.max(0, maxY) + 'px';
+    }
+
+    // YES button action
+    function yes() {
+      document.getElementById('reply').innerHTML =
+        "YAYYY NADIA 💕😍<br>You’re my Valentine 💘<br>— From Shivon ❤️";
+
+      // Open the external song link in a new tab (user-initiated click)
+      window.open(songLink, '_blank', 'noopener');
+      launchConfetti();
+    }
+
+    // Confetti logic
+    let confettiPieces = [];
+
+    function launchConfetti() {
+      confettiPieces = [];
+      for (let i = 0; i < 200; i++) {
+        confettiPieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 6 + 4,
+          speed: Math.random() * 10 + 5,
+          color: `hsl(${Math.random() * 360},100%,70%)`,
+          tilt: Math.random() * 10
+        });
+      }
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiPieces.forEach((p, i) => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        p.y += p.speed;
+        p.x += Math.sin(p.tilt);
+        if (p.y > canvas.height) confettiPieces.splice(i, 1);
+      });
+      if (confettiPieces.length > 0) requestAnimationFrame(animateConfetti);
+    }
+  </script>
+
+</body>
+</html>
